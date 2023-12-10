@@ -1,50 +1,54 @@
 import { openDB } from 'idb';
 
-const initdb = async () =>
-  openDB('jate', 1, {
+const DB_NAME = 'jate';
+const DB_VERSION = 1;
+const STORE_NAME = 'jate_store';
+
+const initdb = async () => {
+  const db = await openDB(DB_NAME, DB_VERSION, {
     upgrade(db) {
-      if (db.objectStoreNames.contains('jate')) {
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        const store = db.createObjectStore(STORE_NAME, { keyPath: 'id', autoIncrement: true });
+        console.log('jate database created');
+      } else {
         console.log('jate database already exists');
-        return;
       }
-      db.createObjectStore('jate', { keyPath: 'id', autoIncrement: true });
-      console.log('jate database created');
     },
   });
+  return db;
+};
 
-// TODO: Add logic to a method that accepts some content and adds it to the database
 export const putDb = async (content) => {
-  
-
   const db = await initdb();
-
-const tx = db.transaction('jate', 'readwrite');
-const store = tx.objectStore('jate');
-const request = store.getAll();
-
-const result = await request;
-console.log('result.value', result);
-return result;
+  const tx = db.transaction(STORE_NAME, 'readwrite');
+  const store = tx.objectStore(STORE_NAME);
+  await store.put(content);
+  await tx.done;
 };
-// TODO: Add logic for a method that gets all the content from the database
+
 export const getDb = async (id) => {
-  console.error('getDb not implemented' , id);
-
   const db = await initdb();
-
-const tx = db.transaction('jate', 'readwrite');
-
-const store = tx.objectStore('jate');
-
-const request = store.delete(id);
-
-const result = await request;
-  console.log('result.value', result);
-  return result?.value;
+  const tx = db.transaction(STORE_NAME, 'readonly');
+  const store = tx.objectStore(STORE_NAME);
+  const request = store.get(id);
+  const result = await request;
+  return result;
 };
 
+export const getAllDb = async () => {
+  const db = await initdb();
+  const tx = db.transaction(STORE_NAME, 'readonly');
+  const store = tx.objectStore(STORE_NAME);
+  const request = store.getAll();
+  const result = await request;
+  return result;
+};
 
-
-
-
-initdb();
+export const deleteDb = async (id) => {
+  const db = await initdb();
+  const tx = db.transaction(STORE_NAME, 'readwrite');
+  const store = tx.objectStore(STORE_NAME);
+  const request = store.delete(id);
+  const result = await request;
+  return result;
+};
