@@ -4,6 +4,16 @@ logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+client/dist/
+node_modules/
+package-lock.json
+server/node_modules/
+server/package-lock.json
+client/dist/
+node_modules/
+package-lock.json
+server/node_modules/
+server/package-lock.json
 
 # Runtime data
 pids
