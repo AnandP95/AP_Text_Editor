@@ -19,12 +19,18 @@ const initdb = async () => {
 };
 
 export const putDb = async (content) => {
-  const db = await initdb();
-  const tx = db.transaction(STORE_NAME, 'readwrite');
-  const store = tx.objectStore(STORE_NAME);
-  await store.put(content);
-  await tx.done;
+  try {
+    const db = await initdb();
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    await store.put(content);
+    await tx.done;
+  } catch (error) {
+    console.error('Error putting data in the database:', error);
+    
+  }
 };
+
 
 export const getDb = async (id) => {
   const db = await initdb();
@@ -52,3 +58,6 @@ export const deleteDb = async (id) => {
   const result = await request;
   return result;
 };
+
+
+initdb();
